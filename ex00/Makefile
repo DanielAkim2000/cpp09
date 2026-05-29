@@ -1,6 +1,6 @@
 NAME = btc
 CXX = c++
-CXXFLAGS = -Wall -Werror -Wextra -std=C++98 -I.
+CXXFLAGS = -Wall -Werror -Wextra -std=c++98 -I.
 
 SRCS = main.cpp BitcoinExchange.cpp
 
@@ -11,8 +11,8 @@ all: $(NAME)
 $(NAME) : $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) $< -o $@
+%.o: %.cpp BitcoinExchange.hpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
 	rm -f $(OBJS)
@@ -21,6 +21,7 @@ fclean: clean
 	rm -rf $(NAME)
 
 re:
-	all fclean
+	make fclean
+	make all
 
 .PHONY= all clean fclean re

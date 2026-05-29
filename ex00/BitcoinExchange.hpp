@@ -10,6 +10,8 @@
 #include <cstdlib>
 #include <cfloat>
 #include <cerrno>
+#include <fstream>
+#include <sstream>
 
 class Date
 {
@@ -24,7 +26,7 @@ public:
 class BitcoinExchange
 {
 private:
-	std::map<std::string, float> _inputs;
+	std::map<std::string, float> _databases;
 
 public:
 	BitcoinExchange();
@@ -36,22 +38,12 @@ public:
 	{
 	private:
 		Parsing();
-		class FileIsInvalid : public std::exception
+		class InputFileIsInvalid : public std::exception
 		{
 		public:
 			const char *what() const throw();
 		};
-		class DateDatabaseIsInvalid : public std::exception
-		{
-		public:
-			const char *what() const throw();
-		};
-		class DateInputFileIsInvalid : public std::exception
-		{
-		public:
-			const char *what() const throw();
-		};
-		class RateInvalid : public std::exception
+		class DatabaseFileIsInvalid : public std::exception
 		{
 		public:
 			const char *what() const throw();
@@ -62,16 +54,20 @@ public:
 		static bool isValidNumber(const std::string &nb);
 		static bool isValidRate(const std::string &rate);
 		static bool isValidLineDatabaseFile(const std::string &rate);
+		static bool isValidDatabaseFile(const std::string &nameFile);
 		static bool isValidLineInputFile(const std::string &rate);
 		// a faire prochainement
 		static std::string getDateInDatabase(const std::string &line);
+		static float getRateInDatabase(const std::string &line);
 		static std::string getDateInInputFile(const std::string &line);
-		static std::string getNbInInputFile(const std::string &line);
+		static float getNbInInputFile(const std::string &line);
 		static void parseInput(const std::string &file);
 		static std::map<std::string, float> parseDatabase(const std::string &file);
 	};
 
 	void convertData(std::string databaseFile, std::string inputFile);
+	void convertAllInputLine(std::string inputFile);
+	float searchValtoLowerDate(std::string date);
 };
 
 #endif

@@ -11,7 +11,7 @@ all: $(NAME)
 $(NAME) : $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 
-%.o: %.cpp BitcoinExchange.hpp
+%.o: %.cpp RPN.hpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:

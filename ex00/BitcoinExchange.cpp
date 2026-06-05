@@ -130,9 +130,15 @@ bool BitcoinExchange::Parsing::isValidNumber(const std::string &nb)
 {
 	std::string::const_iterator it;
 	int nbComma = 0;
+	size_t i = 0;
 
-	it = nb.begin();
-	while (it != nb.end())
+	if (nb.empty())
+		throw std::runtime_error("Error: bad input.");
+	if (nb[0] == '+' || nb[0] == '-')
+		i = 1;
+	if (i == nb.length())
+		throw std::runtime_error("Error: bad input.");
+	for (it = nb.begin() + i; it != nb.end(); ++it)
 	{
 		if (!std::isdigit(static_cast<unsigned char>(*it)) && *it != '.')
 			throw std::runtime_error("Error: bad input.");
@@ -142,7 +148,6 @@ bool BitcoinExchange::Parsing::isValidNumber(const std::string &nb)
 				throw std::runtime_error("Error: bad input.");
 			nbComma++;
 		}
-		it++;
 	}
 	std::string::size_type pos = nb.find('.');
 	if (pos != std::string::npos && pos + 1 == nb.length())

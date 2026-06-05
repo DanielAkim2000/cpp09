@@ -5,6 +5,7 @@
 #include <list>
 #include <stack>
 #include <string>
+#include <exception>
 
 bool isOperator(char c);
 
@@ -30,8 +31,6 @@ private:
 		static std::string parse(char *av);
 	};
 
-	bool isSpace(char c) const;
-	bool isDigitChar(char c) const;
 	bool willAddOverflow(long a, long b) const;
 	bool willSubOverflow(long a, long b) const;
 	bool willMulOverflow(long a, long b) const;

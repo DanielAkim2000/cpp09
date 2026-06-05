@@ -72,12 +72,12 @@ void Rpn::addNumber(char c)
 	this->_datas.push(val);
 }
 
-bool Rpn::isSpace(char c) const
+bool isSpace(char c)
 {
 	return (std::isspace(static_cast<unsigned char>(c)) != 0);
 }
 
-bool Rpn::isDigitChar(char c) const
+bool isDigitChar(char c)
 {
 	return (std::isdigit(static_cast<unsigned char>(c)) != 0);
 }
@@ -187,9 +187,9 @@ void Rpn::execRpn(char *av)
 	std::string str = av;
 	for (size_t i = 0; i < str.size(); ++i)
 	{
-		if (this->isSpace(str[i]))
+		if (isSpace(str[i]))
 			continue;
-		if (this->isDigitChar(str[i]))
+		if (isDigitChar(str[i]))
 		{
 			this->addNumber(str[i]);
 		}

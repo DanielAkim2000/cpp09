@@ -104,26 +104,60 @@ void PmergeMe::splitWinnersLosersVector(size_t size, std::vector<int> &winners, 
 		_vec[idx++] = losers[i];
 }
 
+void PmergeMe::generateJacobsthalVector(std::vector<size_t> &jacobsthal, size_t losersSize) const
+{
+	jacobsthal.push_back(1);
+	jacobsthal.push_back(3);
+	while (jacobsthal.back() < losersSize)
+	{
+		size_t n = jacobsthal.size();
+		size_t next = jacobsthal[n - 1] + 2 * jacobsthal[n - 2];
+		jacobsthal.push_back(next);
+	}
+}
+
+void PmergeMe::generateOrderVector(std::vector<size_t> &order, size_t losersSize, std::vector<size_t> jacobsthal) const
+{
+	size_t prev = 1;
+	for (size_t gi = 1; gi < jacobsthal.size(); gi++)
+	{
+		size_t end = std::min(jacobsthal[gi], losersSize);
+		for (size_t k = end; k > prev; k--)
+		{
+			if (k - 1 < losersSize)
+				order.push_back(k - 1);
+		}
+		prev = end;
+		if (prev >= losersSize)
+			break;
+	}
+}
+
 void PmergeMe::insertLosersVector(std::vector<int> &winners, std::vector<int> &losers, int last, bool hasLast)
 {
-	std::vector<int> originalWinners(winners);
 	std::vector<int> mainChain(_vec.begin(), _vec.begin() + winners.size());
-
 	mainChain.insert(mainChain.begin(), losers[0]);
-
-	for (size_t i = 1; i < losers.size(); i++)
+	std::vector<size_t> jacobsthal;
+	std::vector<size_t> order;
+	generateJacobsthalVector(jacobsthal, losers.size());
+	generateOrderVector(order, losers.size(), jacobsthal);
+	size_t insertedCount = 1;
+	for (size_t oi = 0; oi < order.size(); oi++)
 	{
-		std::vector<int>::iterator bound = std::find(mainChain.begin(), mainChain.end(), originalWinners[i]);
-		std::vector<int>::iterator pos = std::lower_bound(mainChain.begin(), bound + 1, losers[i]);
-		mainChain.insert(pos, losers[i]);
+		size_t li = order[oi];
+		size_t winPosIdx = li + insertedCount;
+		std::vector<int>::iterator winPos = mainChain.begin() + winPosIdx;
+		std::vector<int>::iterator pos =
+			std::lower_bound(mainChain.begin(), winPos + 1, losers[li]);
+		mainChain.insert(pos, losers[li]);
+		insertedCount++;
 	}
-
 	if (hasLast)
 	{
-		std::vector<int>::iterator pos = std::lower_bound(mainChain.begin(), mainChain.end(), last);
+		std::vector<int>::iterator pos =
+			std::lower_bound(mainChain.begin(), mainChain.end(), last);
 		mainChain.insert(pos, last);
 	}
-
 	for (size_t i = 0; i < mainChain.size(); i++)
 		_vec[i] = mainChain[i];
 }
@@ -172,23 +206,58 @@ void PmergeMe::splitWinnersLosersDeque(size_t size, std::deque<int> &winners, st
 		_deq[idx++] = losers[i];
 }
 
+void PmergeMe::generateJacobsthalDeque(std::deque<size_t> &jacobsthal, size_t losersSize) const
+{
+	jacobsthal.push_back(1);
+	jacobsthal.push_back(3);
+	while (jacobsthal.back() < losersSize)
+	{
+		size_t n = jacobsthal.size();
+		size_t next = jacobsthal[n - 1] + 2 * jacobsthal[n - 2];
+		jacobsthal.push_back(next);
+	}
+}
+
+void PmergeMe::generateOrderDeque(std::deque<size_t> &order, size_t losersSize, std::deque<size_t> jacobsthal) const
+{
+	size_t prev = 1;
+	for (size_t gi = 1; gi < jacobsthal.size(); gi++)
+	{
+		size_t end = std::min(jacobsthal[gi], losersSize);
+		for (size_t k = end; k > prev; k--)
+		{
+			if (k - 1 < losersSize)
+				order.push_back(k - 1);
+		}
+		prev = end;
+		if (prev >= losersSize)
+			break;
+	}
+}
+
 void PmergeMe::insertLosersDeque(std::deque<int> &winners, std::deque<int> &losers, int last, bool hasLast)
 {
-	std::deque<int> originalWinners(winners);
-	std::deque<int> mainChain(_deq.begin(), _deq.begin() + winners.size());
-
+	std::deque<int> mainChain(_vec.begin(), _vec.begin() + winners.size());
 	mainChain.insert(mainChain.begin(), losers[0]);
-
-	for (size_t i = 1; i < losers.size(); i++)
+	std::deque<size_t> jacobsthal;
+	std::deque<size_t> order;
+	generateJacobsthalDeque(jacobsthal, losers.size());
+	generateOrderDeque(order, losers.size(), jacobsthal);
+	size_t insertedCount = 1;
+	for (size_t oi = 0; oi < order.size(); oi++)
 	{
-		std::deque<int>::iterator bound = std::find(mainChain.begin(), mainChain.end(), originalWinners[i]);
-		std::deque<int>::iterator pos = std::lower_bound(mainChain.begin(), bound + 1, losers[i]);
-		mainChain.insert(pos, losers[i]);
+		size_t li = order[oi];
+		size_t winPosIdx = li + insertedCount;
+		std::deque<int>::iterator winPos = mainChain.begin() + winPosIdx;
+		std::deque<int>::iterator pos =
+			std::lower_bound(mainChain.begin(), winPos + 1, losers[li]);
+		mainChain.insert(pos, losers[li]);
+		insertedCount++;
 	}
-
 	if (hasLast)
 	{
-		std::deque<int>::iterator pos = std::lower_bound(mainChain.begin(), mainChain.end(), last);
+		std::deque<int>::iterator pos =
+			std::lower_bound(mainChain.begin(), mainChain.end(), last);
 		mainChain.insert(pos, last);
 	}
 
@@ -202,12 +271,10 @@ void PmergeMe::sortChunkDeque(size_t size)
 		return;
 
 	makePairsDeque(size);
-
 	std::deque<int> winners;
 	std::deque<int> losers;
 	int last = -1;
 	bool hasLast = false;
-
 	splitWinnersLosersDeque(size, winners, losers, last, hasLast);
 	sortChunkDeque(winners.size());
 	insertLosersDeque(winners, losers, last, hasLast);
